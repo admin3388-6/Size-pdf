@@ -31,9 +31,8 @@ app.post('/compress', upload.single('pdfFile'), (req, res) => {
 
     // 🔑 أمر Ghostscript القوي لتقليل الحجم مع جودة جيدة
     // يمكنك تغيير /ebook إلى /screen أو /printer لتغيير مستوى الضغط
-    const gsCommand = `gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/ebook -dNOPAUSE -dBATCH -sOutputFile=${outputPath} ${inputPath}`;
-
-    // تشغيل الأمر
+    // تم إضافة علامتي اقتباس مفردة (') حول المسارات
+const gsCommand = `gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/ebook -dNOPAUSE -dBATCH -sOutputFile='${outputPath}' '${inputPath}'`;    // تشغيل الأمر
     exec(gsCommand, (error, stdout, stderr) => {
         // تنظيف ملف الإدخال المؤقت فوراً
         fs.unlinkSync(inputPath);
