@@ -8,7 +8,21 @@ const rateLimit = require('express-rate-limit');
 const mime = require('mime-types');
 
 const app = express();
-app.use(cors());
+
+// فقط السماح بدومين محدد
+const allowedOrigin = 'https://skydata.bond';
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if(origin && origin !== allowedOrigin){
+    return res.status(403).send("⛔ ممنوع: هذا الطلب لا يأتي من الدومين المصرح به");
+  }
+  next();
+});
+
+// CORS محدود للدومين
+app.use(cors({
+  origin: allowedOrigin
+}));
 
 // منع السبام: 1 طلب لكل IP كل 5 ثواني
 const limiter = rateLimit({
@@ -35,7 +49,7 @@ app.post('/compress', upload.single('file'), async (req, res) => {
     return res.status(400).send("❌ الملف ليس PDF");
   }
 
-  // التحقق من الحجم (≤ 40 MB)
+  // التحقق من الحجم
   if (file.size > 40 * 1024 * 1024) {
     fs.unlink(file.path, () => {});
     return res.status(400).send("❌ حجم الملف أكبر من 40MB");
